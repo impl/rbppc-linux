@@ -166,7 +166,8 @@ all: zImage
 
 # With make 3.82 we cannot mix normal and wildcard targets
 BOOT_TARGETS1 := zImage zImage.initrd uImage
-BOOT_TARGETS2 := zImage% dtbImage% treeImage.% cuImage.% simpleImage.%
+BOOT_TARGETS2 := uImage.fit.% zImage% dtbImage% treeImage.% cuImage.% \
+		simpleImage.%
 
 PHONY += $(BOOT_TARGETS1) $(BOOT_TARGETS2)
 
@@ -199,6 +200,7 @@ define archhelp
   @echo '* zImage          - Build default images selected by kernel config'
   @echo '  zImage.*        - Compressed kernel image (arch/$(ARCH)/boot/zImage.*)'
   @echo '  uImage          - U-Boot native image format'
+  @echo '  uImage.fit.<dt> - U-Boot Flattened Image Tree image format'
   @echo '  cuImage.<dt>    - Backwards compatible U-Boot image for older'
   @echo '                    versions which do not support device trees'
   @echo '  dtbImage.<dt>   - zImage with an embedded device tree blob'

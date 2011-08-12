@@ -221,6 +221,20 @@ config ATMEL_SSC
 
 	  If unsure, say N.
 
+config UCC_TDM
+	tristate "Freescale UCC TDM Driver"
+	depends on QUICC_ENGINE && UCC_FAST
+	default n
+	help
+	 The TDM driver is for UCC based TDM devices for example, TDM device on
+	 MPC832x RDB. Select it to run PowerVoIP on MPC832x RDB board.
+	 The TDM driver can interface with SLIC kind of devices to transmit
+	 and receive TDM samples. The TDM driver receives Time Division
+	 multiplexed samples(for different channels) from the SLIC device,
+	 demutiplexes them and sends them to the upper layers. At the transmit
+	 end the TDM drivers receives samples for different channels, it
+	 multiplexes them and sends them to the SLIC device.
+
 config ENCLOSURE_SERVICES
 	tristate "Enclosure Services"
 	default n

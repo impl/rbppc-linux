@@ -47,6 +47,9 @@ CROSS=
 # mkimage wrapper script
 MKIMAGE=$srctree/scripts/mkuboot.sh
 
+# script to generate an .its file for uImage.fit.* images
+MKITS=$srctree/scripts/mkits.sh
+
 # directory for object and other files used by this script
 object=arch/powerpc/boot
 objbin=$object
@@ -143,7 +146,7 @@ objflags=-S
 tmp=$tmpdir/zImage.$$.o
 ksection=.kernel:vmlinux.strip
 isection=.kernel:initrd
-link_address='0x400000'
+link_address='0x490000'
 
 case "$platform" in
 pseries)
@@ -163,7 +166,7 @@ coff)
     link_address='0x500000'
     pie=
     ;;
-miboot|uboot)
+miboot|uboot|uboot.fit)
     # miboot and U-boot want just the bare bits, not an ELF binary
     ext=bin
     objflags="-O binary"
@@ -212,7 +215,7 @@ ps3)
     link_address=''
     pie=
     ;;
-ep88xc|ep405|ep8248e)
+ep88xc|ep405|ep8248e|rb600|rb333)
     platformo="$object/fixed-head.o $object/$platform.o"
     binary=y
     ;;
@@ -286,6 +289,21 @@ uboot)
     rm -f "$ofile"
     ${MKIMAGE} -A ppc -O linux -T kernel -C gzip -a $membase -e $membase \
 	$uboot_version -d "$vmz" "$ofile"
+    if [ -z "$cacheit" ]; then
+	rm -f "$vmz"
+    fi
+    exit 0
+    ;;
+uboot.fit)
+    rm -f "$ofile"
+    ${MKITS} -A ppc -C gzip -a $membase -e $membase -v $version \
+	-d "$srctree/$dtb" -k "$srctree/$vmz" -o "$object/uImage.its"
+
+    # mkimage calls dtc for FIT images so use kernel dtc if necessary
+    export PATH=$PATH:$srctree/scripts/dtc
+
+    ${MKIMAGE} -f "$object/uImage.its" "$ofile"
+    rm "$object/uImage.its"
     if [ -z "$cacheit" ]; then
 	rm -f "$vmz"
     fi

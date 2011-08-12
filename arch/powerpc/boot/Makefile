@@ -75,7 +75,7 @@ src-plat := of.c cuboot-52xx.c cuboot-824x.c cuboot-83xx.c cuboot-85xx.c holly.c
 		cuboot-pq2.c cuboot-sequoia.c treeboot-walnut.c \
 		cuboot-bamboo.c cuboot-mpc7448hpc2.c cuboot-taishan.c \
 		fixed-head.S ep88xc.c ep405.c cuboot-c2k.c \
-		cuboot-katmai.c cuboot-rainier.c redboot-8xx.c ep8248e.c \
+		cuboot-katmai.c cuboot-rainier.c redboot-8xx.c ep8248e.c rb600.c rb333.c \
 		cuboot-warp.c cuboot-85xx-cpm2.c cuboot-yosemite.c simpleboot.c \
 		virtex405-head.S virtex.c redboot-83xx.c cuboot-sam440ep.c \
 		cuboot-acadia.c cuboot-amigaone.c cuboot-kilauea.c \
@@ -237,6 +237,8 @@ image-$(CONFIG_MPC834x_ITX)		+= cuImage.mpc8349emitx \
 image-$(CONFIG_MPC834x_MDS)		+= cuImage.mpc834x_mds
 image-$(CONFIG_MPC836x_MDS)		+= cuImage.mpc836x_mds
 image-$(CONFIG_ASP834x)			+= dtbImage.asp834x-redboot
+image-$(CONFIG_RB_PPC)			+= dtbImage.rb600 \
+					   dtbImage.rb333
 
 # Board ports in arch/powerpc/platform/85xx/Kconfig
 image-$(CONFIG_MPC8540_ADS)		+= cuImage.mpc8540ads
@@ -315,6 +317,9 @@ $(obj)/zImage.iseries: vmlinux
 $(obj)/uImage: vmlinux $(wrapperbits)
 	$(call if_changed,wrap,uboot)
 
+$(obj)/uImage.fit.%: vmlinux $(obj)/%.dtb $(wrapperbits)
+	$(call if_changed,wrap,uboot.fit,,$(obj)/$*.dtb)
+
 $(obj)/cuImage.initrd.%: vmlinux $(obj)/%.dtb $(wrapperbits)
 	$(call if_changed,wrap,cuboot-$*,,$(obj)/$*.dtb,$(obj)/ramdisk.image.gz)
 
@@ -352,7 +357,7 @@ install: $(CONFIGURE) $(addprefix $(obj)/, $(image-y))
 
 # anything not in $(targets)
 clean-files += $(image-) $(initrd-) cuImage.* dtbImage.* treeImage.* \
-	zImage zImage.initrd zImage.chrp zImage.coff zImage.holly \
+	uImage.* zImage zImage.initrd zImage.chrp zImage.coff zImage.holly \
 	zImage.iseries zImage.miboot zImage.pmac zImage.pseries \
 	zImage.maple simpleImage.* otheros.bld *.dtb
 

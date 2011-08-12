@@ -669,6 +669,14 @@ struct ucc_slow_pram {
 #define UCC_GETH_UCCE_RXF1      0x00000002
 #define UCC_GETH_UCCE_RXF0      0x00000001
 
+/* Transparent UCC Event Register (UCCE) */
+#define UCC_TRANS_UCCE_GRA 0x0080
+#define UCC_TRANS_UCCE_TXE 0x0010
+#define UCC_TRANS_UCCE_RXF 0x0008
+#define UCC_TRANS_UCCE_BSY 0x0004
+#define UCC_TRANS_UCCE_TXB 0x0002
+#define UCC_TRANS_UCCE_RXB 0x0001
+
 /* UCC Protocol Specific Mode Register (UPSMR), when used for UART */
 #define UCC_UART_UPSMR_FLC		0x8000
 #define UCC_UART_UPSMR_SL		0x4000

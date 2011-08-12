@@ -81,6 +81,10 @@ config LEDS_AMS_DELTA
 	help
 	  This option enables support for the LEDs on Amstrad Delta (E3).
 
+config LEDS_RB_PPC
+	tristate "LED Support for RB300/RB600/RB1000"
+	depends on LEDS_CLASS && RB_PPC
+
 config LEDS_NET48XX
 	tristate "LED Support for Soekris net48xx series Error LED"
 	depends on LEDS_CLASS

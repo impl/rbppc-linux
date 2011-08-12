@@ -45,6 +45,12 @@ config VITESSE_PHY
         ---help---
           Currently supports the vsc8244
 
+config VITESSE_PHY_8601_SKEW
+	bool "Enable skew timing to vsc8601"
+	depends on VITESSE_PHY
+	---help---
+	  Apply clock timing adjustments for vsc8601
+
 config SMSC_PHY
 	tristate "Drivers for SMSC PHYs"
 	---help---

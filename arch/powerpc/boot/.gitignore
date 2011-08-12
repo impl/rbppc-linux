@@ -18,6 +18,7 @@ kernel-vmlinux.strip.c
 kernel-vmlinux.strip.gz
 mktree
 uImage
+uImage.fit.*
 cuImage.*
 dtbImage.*
 treeImage.*

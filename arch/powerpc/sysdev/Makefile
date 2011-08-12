@@ -62,6 +62,8 @@ endif
 
 obj-$(CONFIG_PPC_SCOM)		+= scom.o
 
+obj-$(CONFIG_RB_IOMAP)		+= rb_iomap.o
+
 subdir-ccflags-$(CONFIG_PPC_WERROR) := -Werror
 
 obj-$(CONFIG_PPC_XICS)		+= xics/
