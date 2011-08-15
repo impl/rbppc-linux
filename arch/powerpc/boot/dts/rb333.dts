@@ -74,17 +74,32 @@
 		reg = <0xfe000000 0x20000>;
 	};
 
+	nnand: nnand {
+		reg = <0xf0000000 0x1000>;
+	};
+
 	nand {
+		device_type = "nand";
+		compatible = "rb,nand";
+		reg = <0xf8000000 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		nnand = <&nnand>;
+
 		ale = <&gpio2 0x3>;
 		cle = <&gpio2 0x2>;
 		nce = <&gpio2 0x1>;
 		rdy = <&gpio2 0x0>;
-		reg = <0xf8000000 0x1000>;
-		device_type = "rb,nand";
-	};
 
-	nnand {
-		reg = <0xf0000000 0x1000>;
+		kernel@0 {
+			 label = "kernel";
+			 reg = <0x00000000 0x00400000>;
+		};
+		rootfs@400000 {
+			 label = "rootfs";
+			 reg = <0x00400000 0x03c00000>;
+		};
 	};
 
 	voltage {
