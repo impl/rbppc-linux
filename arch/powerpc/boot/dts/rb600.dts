@@ -152,10 +152,6 @@
 		reg = <0xe0000000 0x200>;
 		bus-frequency = <0x1>;
 
-		led {
-			user_led = <&gpio 0x8>;
-		};
-
 		beeper {
 			reg = <0x500 0x100>;
 		};
@@ -165,6 +161,24 @@
 			device-id = <0x0>;
 			compatible = "gpio";
 			device_type = "gpio";
+		};
+
+		gpio1: gpio-controller@c00 {
+			#gpio-cells = <2>;
+			compatible = "fsl,mpc8349-gpio";
+			reg = <0xc00 0x100>;
+			interrupts = <74 0x8>;
+			interrupt-parent = <&ipic>;
+			gpio-controller;
+		};
+
+		gpio2: gpio-controller@d00 {
+			#gpio-cells = <2>;
+			compatible = "fsl,mpc8349-gpio";
+			reg = <0xd00 0x100>;
+			interrupts = <75 0x8>;
+			interrupt-parent = <&ipic>;
+			gpio-controller;
 		};
 
 		dma@82a8 {
@@ -293,6 +307,15 @@
 			reg = <0x200 0x100>;
 			compatible = "mpc83xx_wdt";
 			device_type = "watchdog";
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		user-led {
+			gpios = <&gpio1 8 0>;
+			linux,default-trigger = "heartbeat";
 		};
 	};
 };

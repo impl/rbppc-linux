@@ -302,51 +302,6 @@ static struct of_device_id rbppc_ids[] = {
 	{ },
 };
 
-static struct resource rbppc_led_resources[2] = {
-	[0] = {
-		.flags		= IORESOURCE_IO,
-	},
-	[1] = {
-		.name		= "user-led",
-	},
-};
-
-static int __init rbppc_init_leds(void)
-{
-	struct device_node *np;
-	const unsigned *uled;
-
-	np = of_find_node_by_name(NULL, "led");
-	if (np) {
-		uled = of_get_property(np, "user_led", NULL);
-		of_node_put(np);
-		if (!uled) {
-			printk("rbppc led error: "
-			       "user_led property is missing\n");
-			return -1;
-		}
-	}
-
-	rbppc_led_resources[1].start = uled[1];
-	rbppc_led_resources[1].end = uled[1];
-
-	np = of_find_node_by_phandle(uled[0]);
-	if (!np) {
-		printk("rbppc led error: no gpio<%x> node found\n", *uled);
-		return -1;
-	}
-	if (of_address_to_resource(np, 0, &rbppc_led_resources[0])) {
-		of_node_put(np);
-		printk("rbppc led error: no reg property in gpio found\n");
-		return -1;
-	}
-	of_node_put(np);
-
-	platform_device_register_simple("rbppc-led", 0,
-					rbppc_led_resources, 2);
-	return 0;
-}
-
 static int __init rbppc_declare_of_platform_devices(void)
 {
 	struct device_node *np;
@@ -389,7 +344,6 @@ static int __init rbppc_declare_of_platform_devices(void)
 		rbppc_beeper_init(np);
 	}
 
-	rbppc_init_leds();
 	return 0;
 }
 machine_device_initcall(rb600, rbppc_declare_of_platform_devices);
