@@ -143,7 +143,7 @@ objflags=-S
 tmp=$tmpdir/zImage.$$.o
 ksection=.kernel:vmlinux.strip
 isection=.kernel:initrd
-link_address='0x490000'
+link_address='0x400000'
 
 case "$platform" in
 pseries)
@@ -212,8 +212,13 @@ ps3)
     link_address=''
     pie=
     ;;
-ep88xc|ep405|ep8248e|rb600|rb333)
+ep88xc|ep405|ep8248e)
     platformo="$object/fixed-head.o $object/$platform.o"
+    binary=y
+    ;;
+rb600|rb333)
+    platformo="$object/fixed-head.o $object/$platform.o"
+    link_address='0x490000'
     binary=y
     ;;
 adder875-redboot)
