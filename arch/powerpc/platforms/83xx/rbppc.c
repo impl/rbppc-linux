@@ -326,11 +326,6 @@ static int __init rbppc_declare_of_platform_devices(void)
 		}
 	}
 
-	np = of_find_node_by_name(NULL, "nand");
-	if (np) {
-		of_platform_device_create(np, "nand", NULL);
-	}
-
 	idx = 0;
 	for_each_node_by_type(np, "rb,cf") {
 		char dev_name[12];

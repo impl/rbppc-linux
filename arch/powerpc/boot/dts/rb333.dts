@@ -2,8 +2,9 @@
 /*
  * RouterBOARD 333 series Device Tree Source
  *
- * Copyright 2010 Alexandros C. Couloumbis <alex@ozo.com>
- * Copyright 2009 Michael Guntsche <mike@it-loops.com>
+ * Copyright (C) 2011 Noah Fontes <nfontes@invectorate.com>
+ * Copyright (C) 2010 Alexandros C. Couloumbis <alex@ozo.com>
+ * Copyright (C) 2009 Michael Guntsche <mike@it-loops.com>
  *
  * This program is free software; you can redistribute  it and/or modify it
  * under  the terms of  the GNU General  Public License as published by the
@@ -44,62 +45,30 @@
 		// interrupt-controller = <&ipic>;
 	};
 
-        cpus {
-                #cpus = <1>;
-                #size-cells = <0>;
-                #address-cells = <1>;
+	cpus {
+		#cpus = <1>;
+		#size-cells = <0>;
+		#address-cells = <1>;
 
-                PowerPC,8323E@0 {
-                        device_type = "cpu";
-                        reg = <0x0>;
-                        i-cache-size = <0x4000>;
-                        d-cache-size = <0x4000>;
-                        i-cache-line-size = <0x20>;
-                        d-cache-line-size = <0x20>;
-                        // clock-frequency = <0x13de3650>;
-                        // timebase-frequency = <0x1fc9f08>;
+		PowerPC,8323E@0 {
+			device_type = "cpu";
+			reg = <0x0>;
+			i-cache-size = <0x4000>;
+			d-cache-size = <0x4000>;
+			i-cache-line-size = <0x20>;
+			d-cache-line-size = <0x20>;
+			// clock-frequency = <0x13de3650>;
+			// timebase-frequency = <0x1fc9f08>;
 			timebase-frequency = <0x0000000>; // filled by the bootwrapper from the firmware blob
 			clock-frequency = <0x00000000>; // filled by the bootwrapper from the firmware blob
 			32-bit;
-                };
-        };
-
-        memory {
-                device_type = "memory";
-                reg = <0x0 0x4000000>;
-                // reg = <0x0 0x0000000>; // filled by the bootwrapper from the firmware blob
-        };
-
-	flash {
-		reg = <0xfe000000 0x20000>;
+		};
 	};
 
-	nnand: nnand {
-		reg = <0xf0000000 0x1000>;
-	};
-
-	nand {
-		device_type = "nand";
-		compatible = "rb,nand";
-		reg = <0xf8000000 0x1000>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-
-		nnand = <&nnand>;
-
-		ale = <&gpio2 0x3>;
-		cle = <&gpio2 0x2>;
-		nce = <&gpio2 0x1>;
-		rdy = <&gpio2 0x0>;
-
-		kernel@0 {
-			 label = "kernel";
-			 reg = <0x00000000 0x00400000>;
-		};
-		rootfs@400000 {
-			 label = "rootfs";
-			 reg = <0x00400000 0x03c00000>;
-		};
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x4000000>;
+		// reg = <0x0 0x0000000>; // filled by the bootwrapper from the firmware blob
 	};
 
 	voltage {
@@ -112,34 +81,77 @@
 		fan_on = <&gpio0 0x10>;
 	};
 
+	localbus@e0005000 {
+		#address-cells = <2>;
+		#size-cells = <1>;
+		compatible = "fsl,mpc8323e-localbus", "fsl,pq2pro-localbus", "simple-bus";
+		reg = <0xe0005000 0xe0>;
+		// FIXME: May not be correct (actual) ranges
+		ranges = <
+			0x0 0x0 0xfe000000 0x00100000   // Flash
+			0x1 0x0 0xf8000000 0x00008000   // NAND (IO base)
+			0x2 0x0 0xf0000000 0x00008000>; // NAND (nNAND?)
+
+		flash@0,0 {
+			reg = <0x0 0x0 0x20000>;
+		};
+
+		nand@1,0 {
+			compatible = "rb,rb333-nand", "rb,nand";
+			reg = <
+				0x1 0x0 0x1000   // IO
+				0x2 0x0 0x1000>; // Sync
+
+			gpios = <
+				&pio_gpio2 0 0   // R/B
+				&pio_gpio2 1 0   // nCE
+				&pio_gpio2 2 0   // CLE
+				&pio_gpio2 3 0>; // ALE
+
+			partitions {
+				#address-cells = <1>;
+				#size-cells = <1>;
+
+				kernel@0 {
+					label = "kernel";
+					reg = <0x00000000 0x00400000>;
+				};
+				rootfs@400000 {
+					label = "rootfs";
+					reg = <0x00400000 0x03c00000>;
+				};
+			};
+		};
+	};
+
 	pci0: pci@e0008500 {
-                device_type = "pci";
-                // compatible = "83xx";
+		device_type = "pci";
+		// compatible = "83xx";
 		compatible = "fsl,mpc8349-pci";
-                reg = <0xe0008500 0x100 0xe0008300 0x8>;
-                #address-cells = <3>;
-                #size-cells = <2>;
-                #interrupt-cells = <1>;
+		reg = <0xe0008500 0x100 0xe0008300 0x8>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+		#interrupt-cells = <1>;
 		// clock-frequency = <0>;
-                ranges = <0x2000000 0x0 0x80000000 0x80000000 0x0 0x20000000 0x1000000 0x0 0x0 0xd0000000 0x0 0x4000000>;
-                bus-range = <0x0 0x0>;
-                interrupt-map = <
+		ranges = <0x2000000 0x0 0x80000000 0x80000000 0x0 0x20000000 0x1000000 0x0 0x0 0xd0000000 0x0 0x4000000>;
+		bus-range = <0x0 0x0>;
+		interrupt-map = <
 			/* IDSEL 0x10 AD16 miniPCI slot 0 */
-                        0x8000 0x0 0x0 0x1 &ipic 0x11 0x8
-                        0x8000 0x0 0x0 0x2 &ipic 0x12 0x8
+			0x8000 0x0 0x0 0x1 &ipic 0x11 0x8
+			0x8000 0x0 0x0 0x2 &ipic 0x12 0x8
 
 			/* IDSEL 0x11 AD17 miniPCI slot 1 */
-                        0x8800 0x0 0x0 0x1 &ipic 0x12 0x8
-                        0x8800 0x0 0x0 0x2 &ipic 0x13 0x8
+			0x8800 0x0 0x0 0x1 &ipic 0x12 0x8
+			0x8800 0x0 0x0 0x2 &ipic 0x13 0x8
 
 			/* IDSEL 0x12 AD18  miniPCI slot 2 */
-                        0x9000 0x0 0x0 0x1 &ipic 0x13 0x8
-                        0x9000 0x0 0x0 0x2 &ipic 0x11 0x8>;
+			0x9000 0x0 0x0 0x1 &ipic 0x13 0x8
+			0x9000 0x0 0x0 0x2 &ipic 0x11 0x8>;
 
-                interrupt-map-mask = <0xf800 0x0 0x0 0x7>;
+		interrupt-map-mask = <0xf800 0x0 0x0 0x7>;
 		interrupt-parent = <&ipic>;
 		// interrupts = <66 0x8>;
-        };
+	};
 
 
 	qe@e0100000 {
@@ -151,10 +163,10 @@
 		#size-cells = <1>;
 		#address-cells = <1>;
 		brg-frequency = <0>;
-                bus-frequency = <0>;
-                // bus-frequency = <198000000>;
-                fsl,qe-num-riscs = <1>;
-                fsl,qe-num-snums = <28>;
+		bus-frequency = <0>;
+		// bus-frequency = <198000000>;
+		fsl,qe-num-riscs = <1>;
+		fsl,qe-num-snums = <28>;
 
 		qeic: qeic@80 {
 			interrupt-controller;
@@ -313,9 +325,37 @@
 		};
 
 		par_io@1400 {
-			num-ports = <4>;
-			device_type = "par_io";
+			#address-cells = <1>;
+			#size-cells = <1>;
 			reg = <0x1400 0x100>;
+			ranges = <
+				0x0 0x1400 0x18
+				0x1 0x1430 0x18
+				0x2 0x1448 0x18>;
+			compatible = "fsl,mpc8323-qe-pario";
+			device_type = "par_io";
+			num-ports = <4>;
+
+			pio_gpio1: gpio-controller@1400 {
+				#gpio-cells = <2>;
+				compatible = "fsl,mpc8323-qe-pario-bank";
+				reg = <0 0x18>;
+				gpio-controller;
+			};
+
+			pio_gpio2: gpio-controller@1430 {
+				#gpio-cells = <2>;
+				compatible = "fsl,mpc8323-qe-pario-bank";
+				reg = <1 0x18>;
+				gpio-controller;
+			};
+
+			pio_gpio3: gpio-controller@1448 {
+				#gpio-cells = <2>;
+				compatible = "fsl,mpc8323-qe-pario-bank";
+				reg = <2 0x18>;
+				gpio-controller;
+			};
 
 			pio4: ucc_pin@04 {
 				pio-map = <
@@ -399,44 +439,44 @@
 			device_type = "serial";
 		};
 
-                dma@82a8 {
-                        #address-cells = <1>;
-                        #size-cells = <1>;
-                        compatible = "fsl,mpc8323-dma", "fsl,elo-dma";
-                        reg = <0x82a8 4>;
-                        ranges = <0 0x8100 0x1a8>;
-                        interrupt-parent = <&ipic>;
-                        interrupts = <71 8>;
-                        cell-index = <0>;
-                        dma-channel@0 {
-                                compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
-                                reg = <0 0x80>;
-                                cell-index = <0>;
-                                interrupt-parent = <&ipic>;
-                                interrupts = <71 8>;
-                        };
-                        dma-channel@80 {
-                                compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
-                                reg = <0x80 0x80>;
-                                cell-index = <1>;
-                                interrupt-parent = <&ipic>;
-                                interrupts = <71 8>;
-                        };
-                        dma-channel@100 {
-                                compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
-                                reg = <0x100 0x80>;
-                                cell-index = <2>;
-                                interrupt-parent = <&ipic>;
-                                interrupts = <71 8>;
-                        };
-                        dma-channel@180 {
-                                compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
-                                reg = <0x180 0x28>;
-                                cell-index = <3>;
-                                interrupt-parent = <&ipic>;
-                                interrupts = <71 8>;
-                        };
-                };
+		dma@82a8 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "fsl,mpc8323-dma", "fsl,elo-dma";
+			reg = <0x82a8 4>;
+			ranges = <0 0x8100 0x1a8>;
+			interrupt-parent = <&ipic>;
+			interrupts = <71 8>;
+			cell-index = <0>;
+			dma-channel@0 {
+				compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
+				reg = <0 0x80>;
+				cell-index = <0>;
+				interrupt-parent = <&ipic>;
+				interrupts = <71 8>;
+			};
+			dma-channel@80 {
+				compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
+				reg = <0x80 0x80>;
+				cell-index = <1>;
+				interrupt-parent = <&ipic>;
+				interrupts = <71 8>;
+			};
+			dma-channel@100 {
+				compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
+				reg = <0x100 0x80>;
+				cell-index = <2>;
+				interrupt-parent = <&ipic>;
+				interrupts = <71 8>;
+			};
+			dma-channel@180 {
+				compatible = "fsl,mpc8323-dma-channel", "fsl,elo-dma-channel";
+				reg = <0x180 0x28>;
+				cell-index = <3>;
+				interrupt-parent = <&ipic>;
+				interrupts = <71 8>;
+			};
+		};
 
 		wdt@200 {
 			reg = <0x200 0x100>;

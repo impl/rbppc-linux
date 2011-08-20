@@ -1,7 +1,8 @@
 /*
  * RouterBOARD 600 series Device Tree Source
  *
- * Copyright 2009 Michael Guntsche <mike@it-loops.com>
+ * Copyright (C) 2011 Noah Fontes <nfontes@invectorate.com>
+ * Copyright (C) 2009 Michael Guntsche <mike@it-loops.com>
  *
  * This program is free software; you can redistribute  it and/or modify it
  * under  the terms of  the GNU General  Public License as published by the
@@ -69,43 +70,48 @@
 		device_type = "rb,cf";
 	};
 
-	flash {
-		reg = <0xff800000 0x20000>;
-	};
-
-	nnand: nnand {
-		reg = <0xf0000000 0x1000>;
-	};
-
-	nand {
-		device_type = "nand";
-		compatible = "rb,nand";
-		reg = <0xf8000000 0x1000>;
-		#address-cells = <1>;
+	localbus@e0005000 {
+		#address-cells = <2>;
 		#size-cells = <1>;
+		compatible = "fsl,mpc8349-localbus", "fsl,pq2pro-localbus", "simple-bus";
+		reg = <0xe0005000 0xe0>;
+		ranges = <
+			0x0 0x0 0xff800000 0x00100000   // Flash, GPCM
+			0x1 0x0 0xf8000000 0x00008000   // NAND (IO base), UPMA
+			0x2 0x0 0xf9000000 0x00020000   // CompactFlash (ATA), UPMC
+			0x3 0x0 0xf9200000 0x00020000   // CompactFlash (ATA), UPMC
+			0x4 0x0 0xf0000000 0x00008000>; // NAND (nNAND?), UPMB
 
-		nnand = <&nnand>;
-
-		ale = <&gpio 0x6>;
-		cle = <&gpio 0x5>;
-		nce = <&gpio 0x4>;
-		rdy = <&gpio 0x3>;
-
-		kernel@0 {
-			 label = "kernel";
-			 reg = <0x00000000 0x00400000>;
+		flash@0,0 {
+			reg = <0x0 0x0 0x20000>;
 		};
-		rootfs@400000 {
-			 label = "rootfs";
-			 reg = <0x00400000 0x03c00000>;
-		};
-	};
 
-	fancon {
-		interrupt-parent = <&ipic>;
-		interrupts = <0x17 0x8>;
-		sense = <&gpio 0x7>;
-		fan_on = <&gpio 0x9>;
+		nand@1,0 {
+			compatible = "rb,rb600-nand", "rb,nand";
+			reg = <
+				0x1 0x0 0x1000   // IO
+				0x4 0x0 0x1000>; // Sync
+
+			gpios = <
+				&gpio1 3 0   // RNB
+				&gpio1 4 0   // NCE
+				&gpio1 5 0   // CLE
+				&gpio1 6 0>; // ALE
+
+			partitions {
+				#address-cells = <1>;
+				#size-cells = <1>;
+
+				kernel@0 {
+					label = "kernel";
+					reg = <0x00000000 0x00400000>;
+				};
+				rootfs@400000 {
+					label = "rootfs";
+					reg = <0x00400000 0x03c00000>;
+				};
+			};
+		};
 	};
 
 	pci0: pci@e0008500 {
@@ -154,13 +160,6 @@
 
 		beeper {
 			reg = <0x500 0x100>;
-		};
-
-		gpio: gpio@0 {
-			reg = <0xc08 0x4>;
-			device-id = <0x0>;
-			compatible = "gpio";
-			device_type = "gpio";
 		};
 
 		gpio1: gpio-controller@c00 {
@@ -317,5 +316,12 @@
 			gpios = <&gpio1 8 0>;
 			linux,default-trigger = "heartbeat";
 		};
+	};
+
+	fan-controller {
+		interrupt-parent = <&ipic>;
+		interrupts = <0x17 0x8>;
+		//sense = <&gpio 0x7>;
+		//fan_on = <&gpio 0x9>;
 	};
 };
