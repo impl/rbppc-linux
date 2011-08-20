@@ -150,10 +150,6 @@ struct ucc_fast_info {
 	enum ucc_fast_rx_decoding_method renc;
 	enum ucc_fast_transparent_tcrc tcrc;
 	enum ucc_fast_sync_len synl;
-	char *tdm_rx_clk;
-	char *tdm_tx_clk;
-	char *tdm_rx_sync;
-	char *tdm_tx_sync;
 };
 
 struct ucc_fast_private {
