@@ -307,14 +307,14 @@
 			compatible = "mpc83xx_wdt";
 			device_type = "watchdog";
 		};
-	};
 
-	leds {
-		compatible = "gpio-leds";
+		leds {
+			compatible = "gpio-leds";
 
-		user-led {
-			gpios = <&gpio1 8 0>;
-			linux,default-trigger = "heartbeat";
+			user-led {
+				gpios = <&gpio1 8 0>;
+				linux,default-trigger = "heartbeat";
+			};
 		};
 	};
 
