@@ -39,10 +39,7 @@
 
 	chosen {
 		bootargs = "console=ttyS0,115200 board=mpc8323 rootfstype=squashfs,yaffs2,jffs2 root=/dev/mtdblock1 boot=1";
-		// linux,platform = <0x8062>;
-		// linux,initrd = <0x488000 0x0>;
 		linux,stdout-path = "/soc8323@e0000000/serial@4500";
-		// interrupt-controller = <&ipic>;
 	};
 
 	cpus {
@@ -57,18 +54,15 @@
 			d-cache-size = <0x4000>;
 			i-cache-line-size = <0x20>;
 			d-cache-line-size = <0x20>;
-			// clock-frequency = <0x13de3650>;
-			// timebase-frequency = <0x1fc9f08>;
-			timebase-frequency = <0x0000000>; // filled by the bootwrapper from the firmware blob
-			clock-frequency = <0x00000000>; // filled by the bootwrapper from the firmware blob
+			timebase-frequency = <0>; // Filled from the bootloader
+			clock-frequency = <0>; // Filled from the bootloader
 			32-bit;
 		};
 	};
 
 	memory {
 		device_type = "memory";
-		reg = <0x0 0x4000000>;
-		// reg = <0x0 0x0000000>; // filled by the bootwrapper from the firmware blob
+		reg = <0 0>; // Filled from the bootloader
 	};
 
 	voltage {
@@ -210,7 +204,7 @@
 		enet0: ucc@2200 {
 			tx-clock = <0x1a>;
 			rx-clock = <0x1f>;
-			mac-address = [00 0c 42 1c 29 d2];
+			mac-address = [00 00 00 00 00 00]; // Filled from the bootloader
 			interrupt-parent = <&qeic>;
 			interrupts = <0x22>;
 			reg = <0x2200 0x200>;
@@ -225,7 +219,7 @@
 		enet1: ucc@3200 {
 			tx-clock = <0x22>;
 			rx-clock = <0x20>;
-			mac-address = [00 0c 42 1c 29 d1];
+			mac-address = [00 00 00 00 00 00]; // Filled from the bootloader
 			interrupt-parent = <&qeic>;
 			interrupts = <0x23>;
 			reg = <0x3200 0x200>;
@@ -240,7 +234,7 @@
 		enet2: ucc@3000 {
 			tx-clock = <0x18>;
 			rx-clock = <0x17>;
-			mac-address = [00 0c 42 1c 29 d0];
+			mac-address = [00 00 00 00 00 00]; // Filled from the bootloader
 			interrupt-parent = <&qeic>;
 			interrupts = <0x21>;
 			reg = <0x3000 0x200>;
@@ -287,7 +281,7 @@
 
 
 	soc8323@e0000000 {
-		bus-frequency = <0x1>;
+		bus-frequency = <0>; // Filled from the bootloader
 		reg = <0xe0000000 0x200>;
 		ranges = <0x0 0xe0000000 0x100000>;
 		device_type = "soc";
@@ -433,7 +427,7 @@
 		serial@4500 {
 			interrupt-parent = <&ipic>;
 			interrupts = <0x9 0x8>;
-			clock-frequency = <0x7f27c20>;
+			clock-frequency = <0>; // Filled from the bootloader
 			reg = <0x4500 0x100>;
 			compatible = "ns16550";
 			device_type = "serial";

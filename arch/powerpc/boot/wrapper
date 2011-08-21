@@ -217,7 +217,7 @@ ep88xc|ep405|ep8248e)
     binary=y
     ;;
 rb600|rb333)
-    platformo="$object/fixed-head.o $object/$platform.o"
+    platformo="$object/fixed-head.o $object/rbppc.o"
     link_address='0x490000'
     binary=y
     ;;
