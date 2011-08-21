@@ -44,7 +44,6 @@ config RB_PPC
 	select QUICC_ENGINE
 	select PPC_MPC832x
 	select PPC_MPC834x
-	select RB_IOMAP
 	help
 	  This option enables support for MikroTik RouterBOARD 333/600 series boards.
 

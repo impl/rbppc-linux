@@ -177,10 +177,6 @@ config PPC_IO_WORKAROUNDS
 config GENERIC_IOMAP
 	bool
 
-config RB_IOMAP
-	bool
-	default y if RB_PPC
-
 source "drivers/cpufreq/Kconfig"
 
 menu "CPU Frequency drivers"
