@@ -234,7 +234,7 @@ static __devinit int rbppc_nand_probe(struct platform_device *pdev)
 		dev_err(dev, "Can't allocate memory!\n");
 		return -ENOMEM;
 	}
-	
+
 	prv->dev = dev;
 
 	chip = &prv->chip;
@@ -365,6 +365,8 @@ static int __devexit rbppc_nand_remove(struct platform_device *pdev)
 
 	nand_release(&prv->mtd);
 	rbppc_nand_free_gpio(prv);
+
+	dev_set_drvdata(dev, NULL);
 
 	return 0;
 }
