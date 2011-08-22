@@ -80,6 +80,8 @@
 		#size-cells = <1>;
 		compatible = "fsl,mpc8323e-localbus", "fsl,pq2pro-localbus", "simple-bus";
 		reg = <0xe0005000 0xe0>;
+		interrupts = <77 0x8>;
+		interrupt-parent <&ipic>;
 		// FIXME: May not be correct (actual) ranges
 		ranges = <
 			0x0 0x0 0xfe000000 0x00100000   // Flash

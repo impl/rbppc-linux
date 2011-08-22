@@ -50,31 +50,13 @@
 		reg = <0 0>; // Filled from the bootloader
 	};
 
-	cf@f9200000 {
-		lb-timings = <0x5dc 0x3e8 0x1194 0x5dc 0x2af8>;
-		interrupt-at-level = <0x0>;
-		interrupt-parent = <&ipic>;
-		interrupts = <0x16 0x8>;
-		lbc_extra_divider = <0x1>;
-		reg = <0xf9200000 0x200000>;
-		device_type = "rb,cf";
-	};
-
-	cf@f9000000 {
-		lb-timings = <0x5dc 0x3e8 0x1194 0x5dc 0x2af8>;
-		interrupt-at-level = <0x0>;
-		interrupt-parent = <&ipic>;
-		interrupts = <0x14 0x8>;
-		lbc_extra_divider = <0x1>;
-		reg = <0xf9000000 0x200000>;
-		device_type = "rb,cf";
-	};
-
 	localbus@e0005000 {
 		#address-cells = <2>;
 		#size-cells = <1>;
 		compatible = "fsl,mpc8349-localbus", "fsl,pq2pro-localbus", "simple-bus";
 		reg = <0xe0005000 0xe0>;
+		interrupts = <77 0x8>;
+		interrupt-parent = <&ipic>;
 		ranges = <
 			0x0 0x0 0xff800000 0x00100000   // Flash, GPCM
 			0x1 0x0 0xf8000000 0x00008000   // NAND (IO base), UPMA
@@ -111,6 +93,24 @@
 					reg = <0x00400000 0x03c00000>;
 				};
 			};
+		};
+
+		pata-upm@2,0 {
+			compatible = "rb,rb600-pata-upm", "rb,pata-upm";
+			reg = <0x2 0x0 0x200000>;
+			interrupts = <20 0x8>;
+			interrupt-parent = <&ipic>;
+
+			rb,pata-upm-localbus-timings = <1500 1000 4500 1500 11000>;
+		};
+
+		pata-upm@3,0 {
+			compatible = "rb,rb600-pata-upm", "rb,pata-upm";
+			reg = <0x3 0x0 0x200000>;
+			interrupts = <22 0x8>;
+			interrupt-parent = <&ipic>;
+
+			rb,pata-upm-localbus-timings = <1500 1000 4500 1500 11000>;
 		};
 	};
 

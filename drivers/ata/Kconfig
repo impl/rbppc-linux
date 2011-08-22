@@ -869,6 +869,15 @@ config PATA_WINBOND_VLB
 	  Support for the Winbond W83759A controller on Vesa Local Bus
 	  systems.
 
+config PATA_RBPPC_UPM
+	tristate "MikroTik RouterBOARD PATA support for Freescale MPC83xx/MPC85xx-based platforms"
+	depends on RB_PPC
+	select FSL_LBC
+	help
+	  This option enables support for PATA devices on MikroTik RouterBOARD
+	  Freescale MPC83xx/MPC85xx-based platforms, such as RB333, RB600, and
+	  RB800.
+
 comment "Generic fallback / legacy drivers"
 
 config PATA_ACPI
@@ -897,13 +906,6 @@ config PATA_LEGACY
 	  ports and allows them to be accessed via the new ATA layer.
 
 	  If unsure, say N.
-
-config PATA_RB_PPC
-	tristate "MikroTik RB600 PATA support"
-	depends on RB_PPC
-	help
-	  This option enables support for PATA devices on MikroTik RouterBOARD
-	  600 series boards.
 
 endif # ATA_SFF
 endif # ATA
