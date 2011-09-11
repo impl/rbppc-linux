@@ -760,7 +760,6 @@ static int __devinit pata_rbppc_upm_probe(struct platform_device *pdev)
 	aio->command_addr = REG_OFFSET(io_addr, ATA_REG_CMD);
 	aio->ctl_addr = REG_OFFSET(io_addr, 14);
 	aio->altstatus_addr = aio->ctl_addr;
-	aio->bmdma_addr = NULL;
 
 	prv->irq = irq_of_parse_and_map(dev->of_node, 0);
 	if (prv->irq == NO_IRQ) {
