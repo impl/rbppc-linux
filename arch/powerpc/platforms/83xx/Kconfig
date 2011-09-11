@@ -38,14 +38,27 @@ config MPC832x_RDB
 	help
 	  This option enables support for the MPC8323 RDB board.
 
-config RB_PPC
-	bool "MikroTik RouterBOARD 333/600 series"
-	select DEFAULT_UIMAGE
-	select QUICC_ENGINE
+config RB333
+	bool "MikroTik RouterBOARD 333 series"
+	select RBPPC_PCI if PCI
 	select PPC_MPC832x
-	select PPC_MPC834x
+	select QUICC_ENGINE
+	select FSL_GTM
+	select FSL_LBC
 	help
-	  This option enables support for MikroTik RouterBOARD 333/600 series boards.
+	  This option enables support for MikroTik RouterBOARD 333 series
+	  boards.
+
+config RB600
+	bool "MikroTik RouterBOARD 600 series"
+	select RBPPC_PCI if PCI
+	select PPC_MPC834x
+	select MPC8xxx_GPIO
+	select FSL_GTM
+	select FSL_LBC
+	help
+	  This option enables support for MikroTik RouterBOARD 600 series
+	  boards.
 
 config MPC834x_MDS
 	bool "Freescale MPC834x MDS"

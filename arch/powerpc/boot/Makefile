@@ -233,13 +233,13 @@ image-$(CONFIG_EP8248E)			+= dtbImage.ep8248e
 # Board ports in arch/powerpc/platform/83xx/Kconfig
 image-$(CONFIG_MPC832x_MDS)		+= cuImage.mpc832x_mds
 image-$(CONFIG_MPC832x_RDB)		+= cuImage.mpc832x_rdb
+image-$(CONFIG_RB333)			+= dtbImage.rb333
 image-$(CONFIG_MPC834x_ITX)		+= cuImage.mpc8349emitx \
 					   cuImage.mpc8349emitxgp
 image-$(CONFIG_MPC834x_MDS)		+= cuImage.mpc834x_mds
+image-$(CONFIG_RB600)			+= dtbImage.rb600
 image-$(CONFIG_MPC836x_MDS)		+= cuImage.mpc836x_mds
 image-$(CONFIG_ASP834x)			+= dtbImage.asp834x-redboot
-image-$(CONFIG_RB_PPC)			+= dtbImage.rb600 \
-					   dtbImage.rb333
 
 # Board ports in arch/powerpc/platform/85xx/Kconfig
 image-$(CONFIG_MPC8540_ADS)		+= cuImage.mpc8540ads

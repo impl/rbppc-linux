@@ -14,7 +14,7 @@
 
 / {
 	model = "RB600";
-	compatible = "MPC83xx";
+	compatible = "RB600", "RBPPC";
 	#address-cells = <1>;
 	#size-cells = <1>;
 
@@ -25,7 +25,7 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyS0,115200 root=/dev/sda2";
+		bootargs = "console=ttyS0,115200 board=mpc8349";
 		linux,stdout-path = "/soc8343@e0000000/serial@4500";
 	};
 
@@ -158,8 +158,20 @@
 		reg = <0xe0000000 0x200>;
 		bus-frequency = <0>; // Filled from the bootloader
 
-		beeper {
-			reg = <0x500 0x100>;
+		gtm1: timer@500 {
+			compatible = "fsl,mpc8349-gtm", "fsl,gtm";
+			reg = <0x500 0x40>;
+			interrupts = <90 0x8 78 0x8 84 0x8 72 0x8>;
+			interrupt-parent = <&ipic>;
+			clock-frequency = <0>; // Filled from the bootloader
+		};
+
+		timer@600 {
+			compatible = "fsl,mpc8349-gtm", "fsl,gtm";
+			reg = <0x600 0x40>;
+			interrupts = <91 0x8 79 0x8 85 0x8 73 0x8>;
+			interrupt-parent = <&ipic>;
+			clock-frequency = <0>; // Filled from the bootloader
 		};
 
 		gpio1: gpio-controller@c00 {
@@ -286,26 +298,26 @@
 		};
 
 		ipic: pic@700 {
-			interrupt-controller;
 			#address-cells = <0>;
 			#interrupt-cells = <2>;
-			reg = <0x700 0x100>;
 			device_type = "ipic";
+			reg = <0x700 0x100>;
+			interrupt-controller;
 		};
 
 		serial@4500 {
-			interrupt-parent = <&ipic>;
-			interrupts = <0x9 0x8>;
-			clock-frequency = <0>; // Filled from the bootloader
-			reg = <0x4500 0x100>;
-			compatible = "ns16550";
 			device_type = "serial";
+			compatible = "ns16550";
+			reg = <0x4500 0x100>;
+			interrupts = <9 0x8>;
+			interrupt-parent = <&ipic>;
+			clock-frequency = <0>; // Filled from the bootloader
 		};
 
 		wdt@200 {
-			reg = <0x200 0x100>;
-			compatible = "mpc83xx_wdt";
 			device_type = "watchdog";
+			compatible = "mpc83xx_wdt";
+			reg = <0x200 0x100>;
 		};
 
 		leds {
@@ -315,6 +327,11 @@
 				gpios = <&gpio1 8 0>;
 				linux,default-trigger = "heartbeat";
 			};
+		};
+
+		beeper {
+			compatible = "rb,rb600-gtm-beeper", "rb,gtm-beeper";
+			timer = <&gtm1 3>;
 		};
 	};
 

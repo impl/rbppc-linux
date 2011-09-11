@@ -1,4 +1,3 @@
-
 /*
  * RouterBOARD 333 series Device Tree Source
  *
@@ -10,24 +9,15 @@
  * under  the terms of  the GNU General  Public License as published by the
  * Free Software Foundation;  either version 2 of the  License, or (at your
  * option) any later version.
- *
- * Warning (reg_format): "reg" property in /qe@e0100000/muram@10000/data-only@0 has invalid length (8 bytes) (#address-cells == 2, #size-cells == 1)
- * Warning (ranges_format): "ranges" property in /qe@e0100000/muram@10000 has invalid length (12 bytes) (parent #address-cells == 1, child #address-cells == 2, #size-cells == 1)
- * Warning (avoid_default_addr_size): Relying on default #address-cells value for /qe@e0100000/muram@10000/data-only@0
- * Warning (avoid_default_addr_size): Relying on default #size-cells value for /qe@e0100000/muram@10000/data-only@0
- * Warning (obsolete_chosen_interrupt_controller): /chosen has obsolete "interrupt-controller" property
- * 
  */
-
 
 /dts-v1/;
 
 / {
 	model = "RB333";
-	compatible = "MPC83xx";
+	compatible = "RB333", "RBPPC";
 	#size-cells = <1>;
 	#address-cells = <1>;
-
 
 	aliases {
 		ethernet0 = &enet0;
@@ -36,9 +26,8 @@
 		pci0 = &pci0;
 	};
 
-
 	chosen {
-		bootargs = "console=ttyS0,115200 board=mpc8323 rootfstype=squashfs,yaffs2,jffs2 root=/dev/mtdblock1 boot=1";
+		bootargs = "console=ttyS0,115200 board=mpc8323";
 		linux,stdout-path = "/soc8323@e0000000/serial@4500";
 	};
 
@@ -66,13 +55,13 @@
 	};
 
 	voltage {
-		voltage_gpio = <&gpio3 0x11>;
+		//voltage_gpio = <&gpio3 0x11>;
 	};
 
 	fancon {
+		interrupts = <20 0x8>;
 		interrupt-parent = <&ipic>;
-		interrupts = <0x14 0x8>;
-		fan_on = <&gpio0 0x10>;
+		//fan_on = <&gpio0 0x10>;
 	};
 
 	localbus@e0005000 {
@@ -81,7 +70,7 @@
 		compatible = "fsl,mpc8323e-localbus", "fsl,pq2pro-localbus", "simple-bus";
 		reg = <0xe0005000 0xe0>;
 		interrupts = <77 0x8>;
-		interrupt-parent <&ipic>;
+		interrupt-parent = <&ipic>;
 		// FIXME: May not be correct (actual) ranges
 		ranges = <
 			0x0 0x0 0xfe000000 0x00100000   // Flash
@@ -121,15 +110,17 @@
 	};
 
 	pci0: pci@e0008500 {
-		device_type = "pci";
-		// compatible = "83xx";
-		compatible = "fsl,mpc8349-pci";
-		reg = <0xe0008500 0x100 0xe0008300 0x8>;
 		#address-cells = <3>;
 		#size-cells = <2>;
 		#interrupt-cells = <1>;
-		// clock-frequency = <0>;
-		ranges = <0x2000000 0x0 0x80000000 0x80000000 0x0 0x20000000 0x1000000 0x0 0x0 0xd0000000 0x0 0x4000000>;
+		device_type = "pci";
+		compatible = "fsl,mpc8349-pci";
+		reg = <0xe0008500 0x100 0xe0008300 0x8>;
+		ranges = <
+			0x02000000 0x0 0x80000000
+			0x80000000 0x0 0x20000000
+			0x01000000 0x0 0x00000000
+			0xd0000000 0x0 0x04000000>;
 		bus-range = <0x0 0x0>;
 		interrupt-map = <
 			/* IDSEL 0x10 AD16 miniPCI slot 0 */
@@ -143,92 +134,59 @@
 			/* IDSEL 0x12 AD18  miniPCI slot 2 */
 			0x9000 0x0 0x0 0x1 &ipic 0x13 0x8
 			0x9000 0x0 0x0 0x2 &ipic 0x11 0x8>;
-
 		interrupt-map-mask = <0xf800 0x0 0x0 0x7>;
 		interrupt-parent = <&ipic>;
-		// interrupts = <66 0x8>;
 	};
 
-
 	qe@e0100000 {
-		reg = <0xe0100000 0x480>;
-		ranges = <0x0 0xe0100000 0x100000>;
-		model = "QE";
-		device_type = "qe";
-		compatible = "fsl,qe";
 		#size-cells = <1>;
 		#address-cells = <1>;
+		device_type = "qe";
+		compatible = "fsl,qe";
+		reg = <0xe0100000 0x480>;
+		ranges = <0x0 0xe0100000 0x100000>;
 		brg-frequency = <0>;
-		bus-frequency = <0>;
-		// bus-frequency = <198000000>;
+		bus-frequency = <198000000>;
 		fsl,qe-num-riscs = <1>;
 		fsl,qe-num-snums = <28>;
 
 		qeic: qeic@80 {
-			interrupt-controller;
+			#address-cells = <0>;
+			#interrupt-cells = <1>;
+			device_type = "qeic";
 			compatible = "fsl,qe-ic";
+			reg = <0x80 0x80>;
 			big-endian;
 			built-in;
-			reg = <0x80 0x80>;
-			#interrupt-cells = <1>;
-			#address-cells = <0>;
-			device_type = "qeic";
-			interrupts = <0x20 0x8 0x21 0x8>;
+			interrupts = <32 0x8 33 0x8>;
 			interrupt-parent = <&ipic>;
-		};
-
-		mdio@2120 {
-			compatible = "ucc_geth_phy";
-			device_type = "mdio";
-			reg = <0x3120 0x18>;
-			#size-cells = <0>;
-			#address-cells = <1>;
-
-			phy3: ethernet-phy@03 {
-				// interface = <0x3>;
-				device_type = "ethernet-phy";
-				reg = <0x3>;
-			};
-
-			phy2: ethernet-phy@02 {
-				// interface = <0x3>;
-				device_type = "ethernet-phy";
-				reg = <0x2>;
-			};
-
-			phy1: ethernet-phy@01 {
-				// interface = <0x3>;
-				device_type = "ethernet-phy";
-				reg = <0x1>;
-			};
+			interrupt-controller;
 		};
 
 		enet0: ucc@2200 {
+			device_type = "network";
+			compatible = "ucc_geth";
+			reg = <0x2200 0x200>;
 			tx-clock = <0x1a>;
 			rx-clock = <0x1f>;
 			mac-address = [00 00 00 00 00 00]; // Filled from the bootloader
 			interrupt-parent = <&qeic>;
 			interrupts = <0x22>;
-			reg = <0x2200 0x200>;
 			device-id = <0x3>;
-			model = "UCC";
-			compatible = "ucc_geth";
-			device_type = "network";
 			phy-handle = <&phy2>;
 			pio-handle = <&pio3>;
 		};
 
 		enet1: ucc@3200 {
+			device_type = "network";
+			compatible = "ucc_geth";
+			reg = <0x3200 0x200>;
 			tx-clock = <0x22>;
 			rx-clock = <0x20>;
 			mac-address = [00 00 00 00 00 00]; // Filled from the bootloader
 			interrupt-parent = <&qeic>;
 			interrupts = <0x23>;
-			reg = <0x3200 0x200>;
 			device-id = <0x4>;
-			model = "UCC";
-			compatible = "ucc_geth";
-			device_type = "network";
 			phy-handle = <&phy3>;
 			pio-handle = <&pio4>;
 		};
@@ -241,37 +199,59 @@
 			interrupts = <0x21>;
 			reg = <0x3000 0x200>;
 			device-id = <0x2>;
-			model = "UCC";
 			compatible = "ucc_geth";
 			device_type = "network";
 			phy-handle = <&phy1>;
 			pio-handle = <&pio2>;
 		};
 
+		mdio@3120 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "ucc_geth_phy";
+			device_type = "mdio";
+			reg = <0x3120 0x18>;
+
+			phy1: ethernet-phy@01 {
+				device_type = "ethernet-phy";
+				reg = <0x1>;
+			};
+
+			phy2: ethernet-phy@02 {
+				device_type = "ethernet-phy";
+				reg = <0x2>;
+			};
+
+			phy3: ethernet-phy@03 {
+				device_type = "ethernet-phy";
+				reg = <0x3>;
+			};
+		};
+
 		spi@500 {
-			mode = "cpu";
-			interrupt-parent = <&qeic>;
-			interrupts = <0x1>;
-			reg = <0x500 0x40>;
-			compatible = "fsl,spi";
 			device_type = "spi";
+			compatible = "fsl,spi";
+			reg = <0x500 0x40>;
+			mode = "cpu";
+			interrupts = <1>;
+			interrupt-parent = <&qeic>;
 		};
 
 		spi@4c0 {
-			mode = "cpu";
-			interrupt-parent = <&qeic>;
-			interrupts = <0x2>;
-			reg = <0x4c0 0x40>;
-			compatible = "fsl,spi";
 			device_type = "spi";
+			compatible = "fsl,spi";
+			reg = <0x4c0 0x40>;
+			mode = "cpu";
+			interrupts = <0x2>;
+			interrupt-parent = <&qeic>;
 		};
 
 		muram@10000 {
 			#address-cells = <1>;
 			#size-cells = <1>;
+			device_type = "muram";
 			compatible = "fsl,qe-muram", "fsl,cpm-muram";
 			ranges = <0x0 0x10000 0x4000>;
-			device_type = "muram";
 
 			data-only@0 {
 				compatible = "fsl,qe-muram-data",
@@ -281,55 +261,42 @@
 		};
 	};
 
-
 	soc8323@e0000000 {
-		bus-frequency = <0>; // Filled from the bootloader
-		reg = <0xe0000000 0x200>;
-		ranges = <0x0 0xe0000000 0x100000>;
-		device_type = "soc";
-		compatible = "simple-bus";
 		#interrupt-cells = <0x2>;
 		#size-cells = <1>;
 		#address-cells = <1>;
+		device_type = "soc";
+		compatible = "simple-bus";
+		reg = <0xe0000000 0x200>;
+		ranges = <0x0 0xe0000000 0x100000>;
+		bus-frequency = <0>; // Filled from the bootloader
 
-		beeper {
-			gpio = <&gpio3 0x12>;
-			reg = <0x500 0x100>;
+		gtm1: timer@500 {
+			compatible = "fsl,mpc8323e-gtm", "fsl,gtm";
+			reg = <0x500 0x40>;
+			interrupts = <90 0x8 78 0x8 84 0x8 72 0x8>;
 			interrupt-parent = <&ipic>;
-			interrupts = <0x48 0x8>;
+			clock-frequency = <0>; // Filled from the bootloader
 		};
 
-		gpio3: gpio@3 {
-			reg = <0x144c 0x4>;
-			device-id = <0x3>;
-			compatible = "qe_gpio";
-			device_type = "gpio";
-		};
-
-		gpio2: gpio@2 {
-			reg = <0x1434 0x4>;
-			device-id = <0x2>;
-			compatible = "qe_gpio";
-			device_type = "gpio";
-		};
-
-		gpio0: gpio@0 {
-			reg = <0x1404 0x4>;
-			device-id = <0x0>;
-			compatible = "qe_gpio";
-			device_type = "gpio";
+		timer@600 {
+			compatible = "fsl,mpc8323e-gtm", "fsl,gtm";
+			reg = <0x600 0x40>;
+			interrupts = <91 0x8 79 0x8 85 0x8 73 0x8>;
+			interrupt-parent = <&ipic>;
+			clock-frequency = <0>; // Filled from the bootloader
 		};
 
 		par_io@1400 {
 			#address-cells = <1>;
 			#size-cells = <1>;
+			device_type = "par_io";
+			compatible = "fsl,mpc8323-qe-pario";
 			reg = <0x1400 0x100>;
 			ranges = <
 				0x0 0x1400 0x18
 				0x1 0x1430 0x18
 				0x2 0x1448 0x18>;
-			compatible = "fsl,mpc8323-qe-pario";
-			device_type = "par_io";
 			num-ports = <4>;
 
 			pio_gpio1: gpio-controller@1400 {
@@ -417,14 +384,13 @@
 		};
 
 		ipic: pic@700 {
-			device_type = "ipic";
-			built-in;
-			reg = <0x700 0x100>;
-			#interrupt-cells = <0x2>;
 			#address-cells = <0x0>;
+			#interrupt-cells = <0x2>;
+			device_type = "ipic";
+			reg = <0x700 0x100>;
+			built-in;
 			interrupt-controller;
 		};
-
 
 		serial@4500 {
 			interrupt-parent = <&ipic>;
@@ -478,6 +444,12 @@
 			reg = <0x200 0x100>;
 			compatible = "mpc83xx_wdt";
 			device_type = "watchdog";
+		};
+
+		beeper {
+			compatible = "rb,rb333-gtm-beeper", "rb,gtm-beeper";
+			timer = <&gtm1 3>;
+			gpios = <&pio_gpio3 18 0>;
 		};
 	};
 };

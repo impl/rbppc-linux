@@ -27,26 +27,31 @@ struct rbppc_ethernet_map {
 	char *alias;
 };
 
-static const struct rbppc_ethernet_map rb333_ethernet_maps[] = {
+static const struct rbppc_ethernet_map ethernet_maps[] = {
+	/*
+	 * RB333 (MPC832x/QE)
+	 */
 	{ .firmware_dtb_path = "/qe@e0100000/ucc@2200",
 	  .alias = "ethernet0", },
 	{ .firmware_dtb_path = "/qe@e0100000/ucc@3200",
 	  .alias = "ethernet1", },
 	{ .firmware_dtb_path = "/qe@e0100000/ucc@3000",
 	  .alias = "ethernet2", },
-	{ },
-};
 
-static const struct rbppc_ethernet_map rb600_ethernet_maps[] = {
+	/*
+	 * RB600 (MPC834x)
+	 */
 	{ .firmware_dtb_path = "/soc8343@e0000000/ethernet@24000",
 	  .alias = "ethernet0", },
 	{ .firmware_dtb_path = "/soc8343@e0000000/ethernet@25000",
 	  .alias = "ethernet1", },
+
 	{ },
 };
 
-static void rbppc_fixup_mac_addresses(const struct rbppc_ethernet_map *maps)
+static void rbppc_fixup_mac_addresses(void)
 {
+	const struct rbppc_ethernet_map *maps = ethernet_maps;
 	struct rbppc_ethernet_map map;
 
 	while((map = *maps++).firmware_dtb_path != NULL) {
@@ -90,53 +95,46 @@ static void rbppc_fixups(void)
 		fatal("Cannot find CPU node\n\r");
 
 	clock_frequency = *(const u32 *)fdt_getprop(firmware_dtb_start, node,
-				       "clock-frequency", &size);
+						    "clock-frequency", &size);
 	timebase_frequency = *(const u32 *)fdt_getprop(firmware_dtb_start, node,
-					  "timebase-frequency", &size);
+						       "timebase-frequency",
+						       &size);
 	bus_frequency = timebase_frequency * 4;
 
 	dt_fixup_cpu_clocks(clock_frequency, timebase_frequency, bus_frequency);
 
 	/*
-	 * Assign bus frequency to SoC node and serial device.
+	 * Assign bus frequency to SoC node, serial devices, and GTMs.
 	 *
 	 * Borrowed from cuboot-83xx.c.
 	 */
 	dev = find_node_by_devtype(NULL, "soc");
 	if (dev) {
-		void *serial = NULL;
+		void *child;
 
 		setprop_val(dev, "bus-frequency", bus_frequency);
 
-		while ((serial = find_node_by_devtype(serial, "serial"))) {
-			if (get_parent(serial) != dev)
+		child = NULL;
+		while ((child = find_node_by_devtype(child, "serial"))) {
+			if (get_parent(child) != dev)
 				continue;
 
-			setprop_val(serial, "clock-frequency", bus_frequency);
+			setprop_val(child, "clock-frequency", bus_frequency);
+		}
+
+		child = NULL;
+		while ((child = find_node_by_compatible(child, "fsl,gtm"))) {
+			if (get_parent(child) != dev)
+				continue;
+
+			setprop_val(child, "clock-frequency", bus_frequency);
 		}
 	}
 
 	/*
 	 * Fix up NIC MAC addresses. RB333 and RB600 vary here.
 	 */
-	dev = finddevice("/");
-	if (dev) {
-		char model[32];
-
-		if (getprop(dev, "model", model, sizeof(model)) > 0) {
-			const struct rbppc_ethernet_map *maps = NULL;
-
-			model[sizeof(model) - 1] = '\0';
-
-			if (strcmp(model, "RB600") == 0)
-				maps = rb600_ethernet_maps;
-			else if (strcmp(model, "RB333") == 0)
-				maps = rb333_ethernet_maps;
-
-			if (maps)
-				rbppc_fixup_mac_addresses(maps);
-		}
-	}
+	rbppc_fixup_mac_addresses();
 
 	/*
 	 * Set up /chosen so it contains the boot parameters specified in the
@@ -146,7 +144,7 @@ static void rbppc_fixups(void)
 	node = fdt_path_offset(firmware_dtb_start, "/chosen");
 	if (dev && node >= 0) {
 		const char *bootargs = fdt_getprop(firmware_dtb_start, node,
-					     "bootargs", &size);
+						   "bootargs", &size);
 		if (size > 0)
 			setprop_str(dev, "bootargs", bootargs);
 	}
