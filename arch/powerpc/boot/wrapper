@@ -218,7 +218,7 @@ ep88xc|ep405|ep8248e)
     ;;
 rb600|rb333)
     platformo="$object/fixed-head.o $object/rbppc.o"
-    link_address='0x490000'
+    link_address='0x498000'
     binary=y
     ;;
 adder875-redboot)
