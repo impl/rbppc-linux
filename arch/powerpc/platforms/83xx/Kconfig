@@ -43,6 +43,7 @@ config RB333
 	select RBPPC_PCI if PCI
 	select PPC_MPC832x
 	select QUICC_ENGINE
+	select QE_GPIO
 	select FSL_GTM
 	select FSL_LBC
 	help
