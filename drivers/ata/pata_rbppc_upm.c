@@ -52,7 +52,7 @@
 #define INST_LOOP		0x00000080 /* First time LOOP is set starts,
 					      next ends */
 #define INST_NA			0x00000008 /* Next burst address */
-#define INST_UTA		0x00000004 /* Transform acknowledge */
+#define INST_UTA		0x00000004 /* Transfer acknowledge */
 #define INST_LAST		0x00000001 /* End of pattern */
 
 #define INST_READ_BASE		(INST_N_BASE | INST_N_WE)
@@ -682,7 +682,7 @@ static int __devinit pata_rbppc_upm_probe(struct platform_device *pdev)
 	int retval;
 
 	printk(KERN_INFO "MikroTik RouterBOARD UPM PATA driver for "
-		"MPC83xx/MPC85xx-based platforms, version " DRV_VERSION "\n");
+	       "MPC83xx/MPC85xx-based platforms, version " DRV_VERSION "\n");
 
 	if (!fsl_lbc_ctrl_dev || !fsl_lbc_ctrl_dev->regs)
 		return -ENODEV;
