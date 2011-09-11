@@ -112,13 +112,13 @@ static void rbppc_nand_write_buf(struct mtd_info *mtd, const uint8_t *buf, int l
 
 static void rbppc_nand_free_gpio(struct rbppc_nand_prv *prv)
 {
-	if(gpio_is_valid(prv->rnb_gpio))
+	if (gpio_is_valid(prv->rnb_gpio))
 		gpio_free(prv->rnb_gpio);
-	if(gpio_is_valid(prv->nce_gpio))
+	if (gpio_is_valid(prv->nce_gpio))
 		gpio_free(prv->nce_gpio);
-	if(gpio_is_valid(prv->cle_gpio))
+	if (gpio_is_valid(prv->cle_gpio))
 		gpio_free(prv->cle_gpio);
-	if(gpio_is_valid(prv->ale_gpio))
+	if (gpio_is_valid(prv->ale_gpio))
 		gpio_free(prv->ale_gpio);
 }
 

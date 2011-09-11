@@ -432,7 +432,7 @@ config MTD_NAND_PLATFORM
 
 config MTD_NAND_RBPPC
 	tristate "MikroTik RouterBOARD NAND support for Freescale MPC83xx/MPC85xx-based platforms"
-	depends on MTD_NAND && RB_PPC
+	depends on PPC_OF && GPIOLIB
 	help
 	  This option enables support for the NAND device on MikroTik
 	  RouterBOARD Freescale MPC83xx/MPC85xx-based platforms, such as RB333,
