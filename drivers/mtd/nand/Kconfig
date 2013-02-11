@@ -405,6 +405,14 @@ config MTD_NAND_PLATFORM
 	  devices. You will need to provide platform-specific functions
 	  via platform_data.
 
+config MTD_NAND_RBPPC
+	tristate "MikroTik RouterBOARD NAND support for Freescale MPC83xx/MPC85xx-based platforms"
+	depends on PPC_OF && GPIOLIB
+	help
+	  This option enables support for the NAND device on MikroTik
+	  RouterBOARD Freescale MPC83xx/MPC85xx-based platforms, such as RB333,
+	  RB600, and RB800.
+
 config MTD_NAND_ORION
 	tristate "NAND Flash support for Marvell Orion SoC"
 	depends on PLAT_ORION

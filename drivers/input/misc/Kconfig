@@ -666,4 +666,12 @@ config INPUT_IDEAPAD_SLIDEBAR
 	  To compile this driver as a module, choose M here: the
 	  module will be called ideapad_slidebar.
 
+config INPUT_RBPPC_GTM_BEEPER
+	tristate "MikroTik RouterBOARD GTM speaker support for Freescale MPC83xx/MPC85xx-based platforms"
+	depends on FSL_GTM && PPC_OF && (GPIOLIB || !RB333)
+	help
+	  This option enables support for the on-board speaker device on
+	  MikroTik RouterBOARD Freescale MPC83xx/MPC85xx-based platforms, such
+	  as RB333, RB600, and RB800.
+
 endif
