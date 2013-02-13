@@ -42,9 +42,9 @@ static const struct rbppc_ethernet_map ethernet_maps[] = {
 	 * RB600 (MPC834x)
 	 */
 	{ .firmware_dtb_path = "/soc8343@e0000000/ethernet@24000",
-	  .alias = "ethernet0", },
-	{ .firmware_dtb_path = "/soc8343@e0000000/ethernet@25000",
 	  .alias = "ethernet1", },
+	{ .firmware_dtb_path = "/soc8343@e0000000/ethernet@25000",
+	  .alias = "ethernet0", },
 
 	{ },
 };
